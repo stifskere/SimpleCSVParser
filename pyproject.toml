@@ -1,6 +1,6 @@
 [project]
 name = "SimpleCSVParser"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
   { name="Memw1", email="stifskere@gmail.com" },
 ]
@@ -14,8 +14,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/stifskere/CSVParser"
-Issues = "https://github.com/stifskere/CSVParser/issues"
+Homepage = "https://github.com/stifskere/SimpleCSVParser"
+Issues = "https://github.com/stifskere/SimpleCSVParser/issues"
 
 [build-system]
 requires = ["hatchling"]
