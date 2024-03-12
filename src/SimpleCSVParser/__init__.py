@@ -1,18 +1,17 @@
-from winreg import ConnectRegistry, QueryValueEx, OpenKey, HKEY_CURRENT_USER
 from re import match, sub, IGNORECASE
-from platform import system
-from subprocess import check_output, CalledProcessError
-
 
 class CSVFile:
     """Represents a CSV file."""
+
     __parsed: list[list[any]]
     __separator: str
 
     @staticmethod
     def __get_list_separator() -> str:
+        from platform import system
         os: str = system()
         if os == "Windows":
+            from winreg import ConnectRegistry, QueryValueEx, OpenKey, HKEY_CURRENT_USER
             return QueryValueEx(
                 OpenKey(
                     ConnectRegistry(
@@ -24,6 +23,7 @@ class CSVFile:
                 "sList"
             )[0]
         elif os == "Linux":
+            from subprocess import check_output, CalledProcessError
             try:
                 lines: list[str] = (check_output(["locale", "settings"])
                                     .decode()
