@@ -1,1 +1,4 @@
 dist/
+
+tests/__pycache__/
+src/SimpleCSVParser/__pycache__/
