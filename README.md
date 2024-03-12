@@ -15,7 +15,7 @@ pip install SimpleCSVParser
 The package contains a single class which is `CSVFile` that represents a CSV file.
 
 ```py
-from CSVParser import CSVFile
+from SimpleCSVParser import CSVFile
 
 
 # create a new instance from a file.

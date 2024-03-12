@@ -136,6 +136,9 @@ class CSVFile:
                 if self.__separator in str(value):
                     value = f"\"{value}\""
 
+                if value is None:
+                    value = ""
+
                 result += f"{value}{self.__separator}"
 
             result = f"{result[:-1]}\n"
