@@ -1,0 +1,22 @@
+[project]
+name = "SimpleCSVParser"
+version = "0.0.1"
+authors = [
+  { name="Memw1", email="stifskere@gmail.com" },
+]
+description = "A simple package to parse CSV"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/stifskere/CSVParser"
+Issues = "https://github.com/stifskere/CSVParser/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
