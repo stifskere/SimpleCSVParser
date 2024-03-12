@@ -1,5 +1,6 @@
 from re import match, sub, IGNORECASE
 
+
 class CSVFile:
     """Represents a CSV file."""
 
