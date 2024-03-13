@@ -15,17 +15,22 @@ pip install SimpleCSVParser
 The package contains a single class which is `CSVFile` that represents a CSV file.
 
 ```py
-from SimpleCSVParser import CSVFile
+# you can use CSVInitError for catching exceptions, 
+# it's the only exception thrown by the library.
+from SimpleCSVParser import CSVHandle, CSVInitError
 
 
 # create a new instance from a file.
-parsed_csv: CSVFile = CSVFile.from_file("my_csv_file.csv")
+parsed_csv: CSVHandle = CSVHandle.from_file("my_csv_file.csv")
 # you can also create a new instance from a raw string.
-parsed_csv = CSVFile("your;csv;here\n1;2;3")
+parsed_csv = CSVHandle("your;csv;here\n1;2;3")
 
 # You can also specify the separator in a second arugment.
-parsed_csv: CSVFile = CSVFile.from_file("my_csv_file.csv", ';')
-parsed_csv = CSVFile("your;csv;here\n1;2;3", ';')
+parsed_csv: CSVHandle = CSVHandle.from_file("my_csv_file.csv", ';')
+parsed_csv = CSVHandle("your;csv;here\n1;2;3", ';')
+
+# or initializing from an array
+parsed_csv: CSVHandle = CSVHandle.from_array(["first", "second"], [1, 2])
 
 # Obtain a specific element, the second argument being 
 # the row number not taking the column name into account.
