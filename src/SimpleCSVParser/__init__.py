@@ -1,44 +1,22 @@
 from re import match, sub, IGNORECASE
+from locale import localeconv, setlocale, LC_ALL
 
 
-class CSVFile:
-    """Represents a CSV file."""
+class CSVInitError(Exception):
+    def __init__(self, what: str):
+        super().__init__(what)
 
-    __parsed: list[list[any]]
+
+class CSVHandle:
+    """Represents a CSV handle."""
+
+    __parsed: list[list[str | int | type(None)]]
     __separator: str
 
     @staticmethod
     def __get_list_separator() -> str:
-        from platform import system
-        os: str = system()
-        if os == "Windows":
-            from winreg import ConnectRegistry, QueryValueEx, OpenKey, HKEY_CURRENT_USER
-            return QueryValueEx(
-                OpenKey(
-                    ConnectRegistry(
-                        None,
-                        HKEY_CURRENT_USER
-                    ),
-                    r"Control Panel\International"
-                ),
-                "sList"
-            )[0]
-        elif os == "Linux":
-            from subprocess import check_output, CalledProcessError
-            try:
-                lines: list[str] = (check_output(["locale", "settings"])
-                                    .decode()
-                                    .strip()
-                                    .split('\n'))
-
-                for line in lines:
-                    if line.startswith('LC_NUMERIC'):
-                        return line.split('=')[1].split(';')[0]
-
-            except CalledProcessError:
-                pass
-
-        return ";"
+        setlocale(LC_ALL, "")
+        return ';' if localeconv()["decimal_point"] == ',' else ','
 
     @staticmethod
     def __split_at_level(to_split: str, separator: str) -> list[str]:
@@ -63,11 +41,12 @@ class CSVFile:
         return result
 
     @staticmethod
-    def __cast_results(set_of_results: list[list[any]]) -> list[list[any]]:
-        result: list[list[any]] = []
+    def __cast_results(set_of_results: list[list[str | int | type(None)]]) \
+            -> list[list[str | int | type(None)]]:
+        result: list[list[str | int | type(None)]] = []
 
         for row in set_of_results:
-            sub_result: list[any] = []
+            sub_result: list[str | int | type(None)] = []
             for value in row:
                 if value.isnumeric():
                     sub_result.append(int(value))
@@ -87,15 +66,22 @@ class CSVFile:
         lines: list[str] = to_parse.splitlines()
 
         had_separator: bool = False
-        if match_separator := match("^[^=]+=(?P<separator>[^\n\r ])$", lines[0], IGNORECASE):
-            if separator is None:
-                separator = match_separator.group("separator")
-            had_separator = True
-        elif separator is None:
+        if len(to_parse) > 0:
+            if match_separator := match("^[^=]+=(?P<separator>[^\n\r ])$", lines[0], IGNORECASE):
+                if separator is None:
+                    separator = match_separator.group("separator")
+                had_separator = True
+        elif separator is None or len(to_parse) <= 0:
             separator = self.__get_list_separator()
 
+        length: int | type(None) = None
         for row in lines[1 if had_separator else 0:]:
-            separated_result.append(self.__split_at_level(row, separator))
+            split: list[str] = self.__split_at_level(row, separator)
+            if length is None:
+                length = len(split)
+            elif len(split) != length:
+                raise CSVInitError("Cannot initialize an instance of CSVParser with an invalid CSV string.")
+            separated_result.append(split)
 
         self.__separator = separator
         self.__parsed = self.__cast_results(separated_result)
@@ -104,7 +90,26 @@ class CSVFile:
     def from_file(path: str, separator: str = None):
         """Create a new instance of CSVFile from a file."""
         with open(path, "r") as file:
-            return CSVFile(file.read(), separator)
+            return CSVHandle(file.read(), separator)
+
+    @staticmethod
+    def from_array(arr: list[list[int | str | type(None)]]):
+        """Initialize a new instance of CSVHandle from a list."""
+        for row in arr:
+            if not isinstance(row, list):
+                raise CSVInitError("A list was found containing something else than list[int|str|NoneType]")
+
+            # this is done for line length sake :)
+            for element in row:
+                if not isinstance(element, str):
+                    if not isinstance(element, int):
+                        if not isinstance(element, float):
+                            if not isinstance(element, type(None)):
+                                raise CSVInitError("element")
+
+            instance: CSVHandle = CSVHandle("")
+            instance.__parsed = arr
+            return instance
 
     def __get_index(self, column_name: str) -> int:
         for index, name in enumerate(self.__parsed[0]):
@@ -113,7 +118,7 @@ class CSVFile:
 
         return -1
 
-    def __getitem__(self, position: tuple[str, int]) -> any:
+    def __getitem__(self, position: tuple[str, int]) -> int | str | type(None):
         """Obtain an item from the parsed CSV object."""
         column, index = position
 
@@ -124,7 +129,7 @@ class CSVFile:
 
         return self.__parsed[index + 1][column_index]
 
-    def get_raw(self) -> list[list[any]]:
+    def get_raw(self) -> list[list[int | str | type(None)]]:
         """Obtain the parsed CSV list generated from the parsed CSV."""
         return self.__parsed
 

@@ -1,20 +1,27 @@
 from unittest import TestCase, main
-from src.SimpleCSVParser import CSVFile
+from src.SimpleCSVParser import CSVHandle
 
 
 class MyTestCase(TestCase):
+
+    def __check_values(self, handle: CSVHandle):
+        self.assertEqual(handle[("first", 0)], None)
+        self.assertEqual(handle[("second", 0)], "hello;a")
+        self.assertEqual(handle[("third", 0)], 3)
+
+        self.assertEqual(handle.get_raw(), [["first", "second", "third"], [None, "hello;a", 3]])
+
+        self.assertEqual(handle.to_string(False), "first;second;third\n;\"hello;a\";3")
+
     def test_parsing(self):
-        file = CSVFile("first;second;third\n;\"hello;a\";3", ';')
-        raw = file.get_raw()
-        string = file.to_string(False)
+        handle = CSVHandle("first;second;third\n;\"hello;a\";3", ';')
+        self.__check_values(handle)
 
-        self.assertEqual(file[("first", 0)], None)
-        self.assertEqual(file[("second", 0)], "hello;a")
-        self.assertEqual(file[("third", 0)], 3)
-
-        self.assertEqual(raw, [["first", "second", "third"], [None, "hello;a", 3]])
-
-        self.assertEqual(string, "first;second;third\n;\"hello;a\";3")
+    def test_init(self):
+        handle: CSVHandle = CSVHandle.from_array(
+            [["first", "second", "third"], [None, "hello;a", 3]]
+        )
+        self.__check_values(handle)
 
 
 if __name__ == '__main__':
