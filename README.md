@@ -1,5 +1,9 @@
 # Simple CSV parser
 
+> [!warning]
+> **This library is now unmaintained** and it's use is not recommended, I don't update this anymore, the use of the
+> [**python's CSV api**](https://docs.python.org/3/library/csv.html) is advised.
+
 This is a simple package designed to serialize and deserialize CSV.
 
 ### Installing
